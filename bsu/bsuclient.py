@@ -1,9 +1,12 @@
 import os
 import aiohttp
 from typing import Optional, Dict
+from datetime import datetime
 
 from loguru import logger
 from dotenv import load_dotenv
+
+from bsu.exceptions import GroupDoesNotExist, ParameterError, ConnectionError
 
 load_dotenv()
 
@@ -56,15 +59,20 @@ class BSUClient:
                 return await response.json()  # Возвращаем JSON ответ
         except aiohttp.ClientResponseError as e:
             logger.error(f"Ошибка запроса: {e.status} {e.message}")
+            if response.status == 400:
+                response_data = await response.json()
+                if response_data.get('error_description', '') == 'Не передан ID расписания':
+                    raise GroupDoesNotExist
+                raise ParameterError
             raise
         except aiohttp.ClientError as e:
             logger.error(f"Ошибка сети или соединения: {e}")
-            raise
+            raise ConnectionError
 
 
-    async def get_schedule(self, group: int, period_start: str, period_end: str):
+    async def get_schedule(self, group: int, period_start: datetime, period_end: datetime):
         params = {
-            'from': period_start,
-            'to': period_end
+            'from': period_start.strftime('%Y-%m-%d'),
+            'to': period_end.strftime('%Y-%m-%d')
         }
         return await self._make_request('GET', f'/schedule/g/{group}', params=params)

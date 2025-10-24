@@ -13,7 +13,8 @@ from bot.answers import (
 from bot.keyboards import menu, back_kb, periods_kb, get_times_kb
 from bot.fsm import States
 from bsu.converters import to_user_dto
-from bot.exceptions import WrongFormatGroupNumber, GroupDoesNotExistOrTooOld
+from bot.exceptions import WrongFormatGroupNumber
+from bsu.exceptions import GroupDoesNotExist, ConnectionError, ParameterError
 
 from bsu.dependencies import get_service
 
@@ -89,14 +90,24 @@ async def insertion_group(msg: types.Message, state: FSMContext, session: AsyncS
             group_number
         )
         state.clear()
-    except WrongFormatGroupNumber as ex:
+    except WrongFormatGroupNumber:
         await main_msg.edit_text(
-            insert_group_msg_error,
+            insert_group_msg_error.format(error='Неправильный формат номера группы'),
+            reply_markup=back_kb
+        )
+    except GroupDoesNotExist:
+        await main_msg.edit_text(
+            insert_group_msg_error.format(error='Группа не существует или не найдена.'),
+            reply_markup=back_kb
+        )
+    except ConnectionError:
+        await main_msg.edit_text(
+            insert_group_msg_error.format(error='Ошибка соединения с сервисом расписания. Попробуйте позже.'),
             reply_markup=back_kb
         )
     except Exception as ex:
         await main_msg.edit_text(
-            f'{ex}',
+            insert_group_msg_error.format(error=ex),
             reply_markup=back_kb
         )
 

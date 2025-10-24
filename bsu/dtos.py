@@ -75,14 +75,14 @@ class PairDTO(BaseModel):
     edworkkind: str
     date: date
     started_at: datetime
-    group: int
+    group_id: int
     online: bool
     teacher_name: str
     room: Optional[str] = None
     links: list[dict]
 
     @classmethod
-    def from_pair_get_dto(cls, pair: PairGetDTO, group: int) -> "PairDTO":
+    def from_pair_get_dto(cls, pair: PairGetDTO, group_id: int) -> "PairDTO":
         self: PairDTO = cls(
             dis = pair.dis,
             edworkkind = pair.edworkkind,
@@ -90,7 +90,7 @@ class PairDTO(BaseModel):
             online = pair.online,
             teacher_name = pair.teacher.name,
             links = pair.links,
-            group = group,
+            group_id = group_id,
 
             date = MyTime.get_date(pair.timestart),
             started_at = MyTime.get_datetime(pair.timestart)

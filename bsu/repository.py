@@ -39,10 +39,8 @@ class BSURepository:
             .values(group_id=group_id)
         )
     
-    async def add_pairs(self, pair_dtos: list[PairDTO]):
-        pairs = []
-        for pair_dto in pair_dtos:
-            pairs.append(Pair(**pair_dto.model_dump()))
+    async def add_pairs(self, pairs_dtos: list[PairDTO]):
+        pairs = [Pair(**pair_dto.model_dump()) for pair_dto in pairs_dtos]
         await self._session.add_all(pairs)
         await self._session.flush()
 
