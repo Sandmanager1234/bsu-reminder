@@ -22,15 +22,15 @@
 2. Build project
 
    ```
-   docker-compose build
+   docker compose build
    ```
 3. Create db with migrations
 
    ```
-   docker-compose run --rm bot alembic upgrade head
+   docker compose run --rm bot alembic upgrade head
    ```
 4. Up project
 
    ```
-   docker-compose up
+   docker compose up -d
    ```
