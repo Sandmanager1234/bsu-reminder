@@ -4,3 +4,4 @@ test.py
 schedule.json
 __pycache__
 *.db
+celery*
